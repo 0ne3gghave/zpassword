@@ -1,6 +1,8 @@
 # Zpass Telegram Bot
 
-Добро пожаловать в **Zpass** — Telegram-бот для генерации паролей, проверки их надежности и хранения в PostgreSQL. Этот проект — плод моих неуклюжих попыток освоить Python, Docker и немного Telegram API. Если вам нужен бот для управления паролями с щепоткой хаотичного кода — вы попали по адресу!
+Добро пожаловать в **Zpass** — Telegram-бот для генерации паролей, проверки их надежности и хранения в PostgreSQL. 
+Этот проект — плод моих неуклюжих попыток освоить Python, Docker и немного Telegram API. 
+Если вам нужен бот для управления паролями с щепоткой хаотичного кода — вы попали по адресу!
 
 ## Описание
 Этот бот умеет:
@@ -9,11 +11,13 @@
 - Хранить пароли в базе PostgreSQL (чтобы не забыть их на салфетке).
 - Всё это упаковано в Docker-контейнеры для удобства.
 
-**Важно:** Бот писался на **Python 3.9**, и я настоятельно рекомендую использовать эту версию для работы "из коробки". Если вы рискнете запустить его на Python 3.10 или новее, возможно, придется чинить что-то руками — я не профи, чтобы гарантировать совместимость!
+**Важно:** Бот писался на **Python 3.9**, и я настоятельно рекомендую использовать эту версию для работы "из коробки". 
+Если вы рискнете запустить его на Python 3.10 или новее, возможно, придется чинить что-то руками — я не профи, чтобы гарантировать совместимость!
 
 ## Установка как Docker-контейнер на Ubuntu
 
-Если вы хотите запустить этого красавца на Ubuntu, вот пошаговая инструкция для вас. Предполагается, что вы уже знаете, где у вас терминал, и не боитесь командной строки. Поехали!
+Если вы хотите запустить этого красавца на Ubuntu, вот пошаговая инструкция для вас. 
+Предполагается, что вы уже знаете, где у вас терминал, и не боитесь командной строки. Поехали!
 
 ### Требования
 - **Ubuntu** (тестировалось на 20.04/22.04, но должно работать и на других версиях).
@@ -24,39 +28,58 @@
 ### Пошаговая инструкция
 
 1. **Обновите систему и установите зависимости:**
-   sudo apt update && sudo apt upgrade -y
-   sudo apt install -y git
+
+ sudo apt update && sudo apt upgrade -y
+
+ sudo apt install -y git
    
-2. Установите Docker:
-	sudo apt install -y docker.io
-	sudo systemctl start docker
-	sudo systemctl enable docker
+3. Установите Docker:
+	
+ sudo apt install -y docker.io
+	
+ sudo systemctl start docker
+	
+ sudo systemctl enable docker
 
 3. Установите Docker Compose:
-	sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-	sudo chmod +x /usr/local/bin/docker-compose
+	
+ sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	
+ sudo chmod +x /usr/local/bin/docker-compose
 
 4. Склонируйте репозиторий:
-	git clone git@github.com:0ne3gghave/zpassword.git
-	cd zpassword
+	
+ git clone git@github.com:0ne3gghave/zpassword.git
+	
+ cd zpassword
 
 5. Создайте и настройте .env:
-	nano .env
-	BOT_TOKEN=ваш_токен_от_BotFather
-	PG_HOST=db
-	PG_PORT=5432
-	PG_USER=bot_user
-	PG_PASSWORD=bot_password
-	PG_DB=bot_db
+	
+ nano .env
+	
+ BOT_TOKEN=ваш_токен_от_BotFather
+	
+ PG_HOST=db
+	
+ PG_PORT=5432
+	
+ PG_USER=bot_user
+	
+ PG_PASSWORD=bot_password
+	
+ PG_DB=bot_db
 
 6. Соберите и запустите контейнеры:
-	sudo docker-compose up -d --build
+	
+ sudo docker-compose up -d --build
 	
 7. Проверка: 
-	sudo docker-compose ps
+	
+ sudo docker-compose ps
 	
 Если что-то сломалось, проверьте логи:
-	sudo docker-compose logs
+	
+ sudo docker-compose logs
 
 Теперь ваш Zpass готов к работе на Ubuntu! Если застрянете, пишите в issues — я не профи, но попробую помочь.
 

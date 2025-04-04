@@ -14,9 +14,8 @@ from callbacks import router as callbacks_router
 from password_check import router as password_check_router
 from keyboards import main_menu
 from decorators import message_cleaner, MessageManager
-from hibp_checker import check_hibp  # Новый импорт
+from hibp_checker import check_hibp
 
-# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -24,11 +23,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Новый роутер для HIBP
 hibp_router = Router()
 
 
-# Состояния для проверки HIBP
 class HIBPCheckStates(StatesGroup):
     AWAITING_HIBP_PASSWORD = State()
 
@@ -40,13 +37,10 @@ async def start_hibp_check(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.answer("🔒 Отправь пароль для проверки через HIBP...", show_alert=True)
 
-        # Удаляем предыдущее сообщение
         await callback.message.delete()
 
-        # Устанавливаем состояние
         await state.set_state(HIBPCheckStates.AWAITING_HIBP_PASSWORD)
 
-        # Отправляем инструкцию
         msg = await callback.message.answer(
             "✍️ <b>Введите пароль для проверки через HIBP:</b>\n"
             "▫️ Минимальная длина: 8 символов\n"
@@ -83,7 +77,6 @@ async def process_hibp_check(message: Message, state: FSMContext):
             await state.clear()
             return
 
-        # Проверка через HIBP
         result = await check_hibp(password)
 
         response = (
@@ -111,30 +104,24 @@ async def main() -> None:
     """Основная функция инициализации бота"""
     global bot
     try:
-        # Инициализация пула соединений
         await create_pool()
         logger.info("✅ PostgreSQL connection pool initialized")
 
-        # Конфигурация бота
         bot = Bot(
             token=TOKEN,
             default=DefaultBotProperties(parse_mode=ParseMode.HTML)
         )
 
-        # Инициализация диспетчера
         dp = Dispatcher()
 
-        # Подключение модулей
         dp.include_router(commands_router)
         dp.include_router(password_check_router)
         dp.include_router(callbacks_router)
-        dp.include_router(hibp_router)  # Добавляем новый роутер
+        dp.include_router(hibp_router)
 
-        # Инициализация структуры БД
         await init_db()
         logger.info("✅ Database schema initialized")
 
-        # Запуск поллинга
         await bot.delete_webhook(drop_pending_updates=True)
         logger.info("🚀 Bot started in polling mode...")
         await dp.start_polling(bot)
@@ -142,7 +129,6 @@ async def main() -> None:
     except Exception as e:
         logger.critical(f"🔥 Critical error: {e}", exc_info=True)
     finally:
-        # Корректное завершение работы
         from database import _pool
         if _pool:
             await _pool.close()

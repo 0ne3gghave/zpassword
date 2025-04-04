@@ -56,16 +56,13 @@ async def process_custom_check(message: Message, state: FSMContext):
             await state.clear()
             return
 
-        # Получаем данные анализа надежности
         report, recommendations = calculate_password_strength(password)
         recommendations_text = "\n".join(
             f"• {rec}" for rec in recommendations) if recommendations else "✅ Пароль соответствует базовым требованиям"
 
-        # Оценка времени взлома
-        online_time = estimate_crack_time(password, mode='online')  # Онлайн атака (Hydra HTTP)
-        offline_md5_time = estimate_crack_time(password, mode='md5')  # Оффлайн атака (MD5)
+        online_time = estimate_crack_time(password, mode='online')
+        offline_md5_time = estimate_crack_time(password, mode='md5')
 
-        # Формируем ответ с учетом времени взлома
         response = (
             f"🔍 <b>Анализ надежности пароля:</b>\n<code>{password}</code>\n\n"
             f"📈 Энтропия: {report['entropy']:.1f} бит\n"
@@ -122,19 +119,16 @@ async def process_hibp_check(message: Message, state: FSMContext):
             await state.clear()
             return
 
-        # Создаем SHA-1 хеш пароля
         sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
         prefix = sha1_hash[:5]
         suffix = sha1_hash[5:]
 
-        # Запрос к HIBP API
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.pwnedpasswords.com/range/{prefix}") as response:
                 if response.status != 200:
                     raise Exception(f"HIBP API вернул ошибку: {response.status}")
                 hashes = await response.text()
 
-        # Проверка совпадений с безопасной обработкой строк
         found = False
         count = 0
         for line in hashes.splitlines():
@@ -150,7 +144,6 @@ async def process_hibp_check(message: Message, state: FSMContext):
                 logger.warning(f"Некорректная строка в ответе HIBP: {line} - {e}")
                 continue
 
-        # Формируем ответ
         if found:
             response = (
                 f"🔍 Проверка пароля в HIBP:\n<code>{password}</code>\n\n"

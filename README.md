@@ -71,7 +71,7 @@
 
 6. Соберите и запустите контейнеры:
 	
- sudo docker-compose up -d --build
+ sudo docker compose up -d --build
 	
 7. Проверка: 
 	

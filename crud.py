@@ -8,7 +8,6 @@ from models import PasswordEntry, Note, User
 
 logger = logging.getLogger(__name__)
 
-# ========== USER OPERATIONS ==========
 async def get_user(user_id: int) -> Optional[User]:
     """Получение информации о пользователе"""
     try:
@@ -17,7 +16,7 @@ async def get_user(user_id: int) -> Optional[User]:
                 "SELECT user_id, username FROM users WHERE user_id = $1",
                 user_id
             )
-            return User(**dict(record)) if record else None  # Корректное использование модели
+            return User(**dict(record)) if record else None
     except asyncpg.PostgresError as e:
         logger.error(f"Ошибка БД: {e}", exc_info=True)
         raise
@@ -31,19 +30,17 @@ async def register_user(user_id: int, username: Optional[str]) -> None:
                 VALUES ($1, $2)
                 ON CONFLICT (user_id) DO UPDATE 
                 SET username = EXCLUDED.username""",
-                user_id, username or ""  # Обработка None
+                user_id, username or ""
             )
     except asyncpg.PostgresError as e:
         logger.error(f"Ошибка регистрации: {e}", exc_info=True)
         raise
 
-# ========== PASSWORD OPERATIONS ==========
 async def save_password(user_id: int, password: str) -> int:
     """Сохранение пароля с лимитом 1000 записей. Возвращает ID пароля."""
     try:
         async with get_connection() as conn:
-            async with conn.transaction():  # Транзакция для атомарности
-                # Удаление старых записей
+            async with conn.transaction():
                 await conn.execute("""
                     WITH to_delete AS (
                         SELECT ctid FROM passwords
@@ -54,7 +51,6 @@ async def save_password(user_id: int, password: str) -> int:
                     DELETE FROM passwords WHERE ctid IN (SELECT ctid FROM to_delete)
                 """, user_id)
 
-                # Вставка новой записи
                 record = await conn.fetchrow(
                     "INSERT INTO passwords (user_id, password) VALUES ($1, $2) RETURNING id",
                     user_id, password
@@ -93,7 +89,6 @@ async def get_password_count(user_id: int) -> int:
         logger.error(f"Ошибка подсчета: {e}", exc_info=True)
         raise
 
-# ========== NOTE OPERATIONS ==========
 async def add_note(user_id: int, password_id: int, content: str) -> Note:
     """Создание заметки привязанной к паролю"""
     try:
@@ -164,7 +159,6 @@ async def delete_password(password_id: int) -> bool:
         logger.error(f"Ошибка удаления: {e}", exc_info=True)
         return False
 
-# ========== EXPORT OPERATIONS ==========
 async def export_note(note_id: int) -> str:
     """Экспорт заметки в файл"""
     filename = None
@@ -190,7 +184,6 @@ async def export_note(note_id: int) -> str:
             except Exception as e:
                 logger.error(f"Ошибка очистки: {e}", exc_info=True)
 
-# ========== DATA MANAGEMENT ==========
 async def clear_all_data(user_id: int) -> None:
     """Полная очистка данных пользователя"""
     try:

@@ -12,12 +12,10 @@ async def check_hibp(password: str) -> Optional[str]:
     Возвращает количество утечек или None, если возникла ошибка.
     """
     try:
-        # Хешируем пароль в SHA-1
         sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
         prefix = sha1_hash[:5]
         suffix = sha1_hash[5:]
 
-        # Запрос к HIBP API
         async with aiohttp.ClientSession() as session:
             url = f"https://api.pwnedpasswords.com/range/{prefix}"
             async with session.get(url) as response:
@@ -25,7 +23,6 @@ async def check_hibp(password: str) -> Optional[str]:
                     logger.error(f"HIBP API вернул ошибку: {response.status}")
                     return None
 
-                # Парсим ответ
                 text = await response.text()
                 for line in text.splitlines():
                     hash_suffix, count = line.split(':')

@@ -16,7 +16,7 @@ from keyboards import (
     password_length_keyboard,
     passwords_pagination,
 )
-from callbacks import MessageManager  # УДАЛЕН НЕНУЖНЫЙ ИМПОРТ show_main_menu
+from callbacks import MessageManager
 import logging
 
 router = Router()
@@ -31,7 +31,6 @@ async def start_command(message: Message, state: FSMContext) -> None:
         await state.set_state(None)
         await state.update_data(manager=manager)
 
-        # Проверка и регистрация пользователя
         user: Optional[TgUser] = cast(TgUser, message.from_user)
         if not user:
             raise ValueError("Не получен объект пользователя")
@@ -40,7 +39,6 @@ async def start_command(message: Message, state: FSMContext) -> None:
         if not existing_user:
             await register_user(user.id, user.username or "")
 
-        # Отправка ЕДИНСТВЕННОГО сообщения с клавиатурой
         welcome_msg = (
             f"👋 <b>Добро пожаловать, {user.username or 'Пользователь'}!</b>\n\n"
             "🔐 Я бот для генерации и хранения паролей.\n"
@@ -48,7 +46,7 @@ async def start_command(message: Message, state: FSMContext) -> None:
         )
         msg = await message.answer(
             welcome_msg,
-            reply_markup=main_menu(),  # Клавиатура отправляется здесь
+            reply_markup=main_menu(),
             parse_mode=ParseMode.HTML
         )
         manager.track(msg)
@@ -117,7 +115,6 @@ async def process_clear_all(callback: CallbackQuery, state: FSMContext) -> None:
             raise ValueError("Недостаточно данных для очистки")
 
         await callback.message.edit_text("✅ Данные удалены")
-        # Отправка главного меню через прямое обновление клавиатуры
         await callback.message.edit_reply_markup(reply_markup=main_menu())
 
     except Exception as e:

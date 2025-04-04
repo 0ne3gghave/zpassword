@@ -19,10 +19,8 @@ def generate_password(length: ALLOWED_LENGTHS) -> str:
     Пример использования:
     generate_password('12') → "aD4#kL9!zX@1"
     """
-    # Конвертация в числовой формат
     length_int = int(length)
 
-    # Наборы символов с валидацией
     categories = {
         'lowercase': string.ascii_lowercase,
         'uppercase': string.ascii_uppercase,
@@ -30,16 +28,13 @@ def generate_password(length: ALLOWED_LENGTHS) -> str:
         'symbols': SYMBOLS
     }
 
-    # Гарантия наличия всех категорий
     required = [random.choice(chars) for chars in categories.values()]
 
-    # Генерация остальной части
     remaining_chars = [
         random.choice(''.join(categories.values()))
         for _ in range(length_int - len(required))
     ]
 
-    # Формирование пароля
     password_chars = required + remaining_chars
     random.shuffle(password_chars)
 
@@ -50,7 +45,6 @@ def estimate_crack_time(password: str, mode: str = 'md5') -> str:
     if not password:
         return "Невозможно оценить"
 
-    # Определяем набор символов
     charsets = {
         "lower": 26,  # a-z
         "upper": 26,  # A-Z
@@ -65,7 +59,6 @@ def estimate_crack_time(password: str, mode: str = 'md5') -> str:
         "special": any(not c.isalnum() for c in password)
     }
 
-    # Расчет размера алфавита
     charset_size = sum(
         size for name, size in charsets.items()
         if used_charsets[name]
@@ -74,22 +67,18 @@ def estimate_crack_time(password: str, mode: str = 'md5') -> str:
     if charset_size == 0:
         return "Недопустимые символы"
 
-    # Расчет комбинаций
     length = len(password)
-    combinations = charset_size ** length  # Числовое значение
+    combinations = charset_size ** length
 
-    # Скорости для разных режимов
     speeds = {
         'online': 15,       # 15 попыток/сек
         'md5': 1_000_000,   # 1 млн попыток/сек
         'bcrypt': 100       # 100 попыток/сек
     }
 
-    # Получаем скорость для выбранного режима
     speed = speeds.get(mode, 1_000_000)
-    seconds = combinations / speed  # Корректная операция с числами
+    seconds = combinations / speed
 
-    # Форматирование результата
     minutes = int(seconds // 60)
     if minutes < 1:
         return "< 1 минуты"

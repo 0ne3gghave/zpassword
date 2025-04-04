@@ -7,7 +7,6 @@ from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
-# Глобальный пул соединений
 from typing import Optional
 _pool: Optional[asyncpg.Pool] = None
 
@@ -49,7 +48,6 @@ async def init_db() -> None:
     async with get_connection() as conn:
         try:
             async with conn.transaction():
-                # Удаление таблиц
                 await conn.execute("""
                     DROP TABLE IF EXISTS 
                         notes, 
@@ -57,7 +55,6 @@ async def init_db() -> None:
                         users CASCADE
                 """)
 
-                # Создание таблиц
                 await conn.execute("""
                     CREATE TABLE users (
                         user_id BIGINT PRIMARY KEY,
@@ -87,7 +84,6 @@ async def init_db() -> None:
                     )
                 """)
 
-                # Индексы
                 await conn.execute("""
                     CREATE INDEX idx_passwords_user 
                     ON passwords(user_id, created_at DESC)

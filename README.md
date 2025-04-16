@@ -75,11 +75,11 @@
 	
 7. Проверка: 
 	
- sudo docker-compose ps
+ sudo docker compose ps
 	
 Если что-то сломалось, проверьте логи:
 	
- sudo docker-compose logs
+ sudo docker compose logs
 
 Теперь ваш Zpass готов к работе на Ubuntu! Если застрянете, пишите в issues — я не профи, но попробую помочь.
 
